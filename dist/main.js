@@ -207,7 +207,6 @@ function main() {
                 description: "Misskeyノートの公開範囲を選択してください。",
                 enumPicker: "select",
                 enumChoices: ["public", "home", "followers"],
-                default: "public"
             },
         ]);
     };
@@ -454,8 +453,8 @@ function main() {
                 misskeyHostedDomain,
                 normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + content.content + misskeyNotePostText.replaceAll("\\n", "\n")
                     , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
-                noteVisibility = misskeyNoteVisibility,
-                fileIds = (await uploadMediaFromMarkdown(content.content, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
+                misskeyNoteVisibility,
+                (await uploadMediaFromMarkdown(content.content, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
             ));
         });
 
@@ -477,11 +476,10 @@ function main() {
             postNote(
                 misskeyAccessToken,
                 misskeyHostedDomain,
-                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") +
-                    (await logseq.Editor.getCurrentBlock()).content + misskeyNotePostText.replaceAll("\\n", "\n")
+                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + (await logseq.Editor.getCurrentBlock()).content + misskeyNotePostText.replaceAll("\\n", "\n")
                     , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
-                noteVisibility = misskeyNoteVisibility,
-                fileIds = (await uploadMediaFromMarkdown((await logseq.Editor.getCurrentBlock()).content,
+                misskeyNoteVisibility,
+                (await uploadMediaFromMarkdown((await logseq.Editor.getCurrentBlock()).content,
                     misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
             );
         });
