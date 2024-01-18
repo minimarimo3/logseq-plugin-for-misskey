@@ -15,14 +15,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: set tag_name
+        run: |
+          echo "tag_name=$(git tag --sort version:refname | tail -n 1)" >> "$GITHUB_ENV"
       - name: Build
         id: build
         run: |
           mkdir ${{ env.PLUGIN_NAME }}
           cp -r document dist index.html icon_ki.png README.md package.json ${{ env.PLUGIN_NAME }}
-          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+          zip -r ${{ env.PLUGIN_NAME }}-${{ env.tag_name }}.zip ${{ env.PLUGIN_NAME }}
           ls
-          echo "tag_name=$(git tag --sort version:refname | tail -n 1)" >> "$GITHUB_ENV"
 
       - name: Create Release
         uses: ncipollo/release-action@v1
