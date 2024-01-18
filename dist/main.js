@@ -78,7 +78,7 @@ function main() {
                 key: "MisskeyAccessToken1",
                 type: "string",
                 title: "Misskeyアクセストークン",
-                description: "1つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                description: "1つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
                 default: ""
             },
             {
@@ -127,7 +127,7 @@ function main() {
                 key: "MisskeyAccessToken2",
                 type: "string",
                 title: "Misskeyアクセストークン",
-                description: "2つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                description: "2つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
                 default: ""
             },
             {
@@ -176,7 +176,7 @@ function main() {
                 key: "MisskeyAccessToken3",
                 type: "string",
                 title: "Misskeyアクセストークン",
-                description: "3つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                description: "3つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
                 default: ""
             },
             {

@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-for-misskey",
-  "version": "v1.0.4",
+  "version": "v1.0.8",
   "main": "index.html",
   "author": "minimarimo3",
   "description": "LogseqからMisskeyにノートを投稿したりLogseqにノートを埋め込んだりを可能にします",
