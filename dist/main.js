@@ -228,6 +228,7 @@ function main() {
                 const fileExtension = filePath.split('.').pop().toLowerCase();
 
                 if (!uploadExtensionAllowList.includes(fileExtension)) {
+                    // FIXME: awaitする必要ないだろこれ
                     await logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
                     return;
                 }
@@ -296,6 +297,7 @@ function main() {
 
     async function getBlockContentFromBlocks(blocks) {
         let contents = [];
+        // blockの投稿順序がどうでもいいこと前提
         async function searchBlocks(blocks) {
             for (const [_, blockUUID] of blocks) {
                 const block = await logseq.Editor.getBlock(blockUUID);
@@ -349,7 +351,7 @@ function main() {
 
     // FIXME: ↓画像のサイズを文字と同じ大きさにしたいので
     //   こうやってfontSizeを取得してるるけど、多分もっといい方法がある
-    async function getCorrentImageSize(imageUrl) {
+    async function getCurrentImageSize(imageUrl) {
         // 一時的なtextarea要素を作成する
         let tempTextarea = document.createElement("textarea");
 
@@ -399,7 +401,7 @@ function main() {
                         imageUrl = data.url;
                     }
 
-                    const [newWidth, newHeight] = await getCorrentImageSize(imageUrl);
+                    const [newWidth, newHeight] = await getCurrentImageSize(imageUrl);
                     // imgタグは(おそらく)logseqにより制御されており、よくわからん動き方をするのでこんなになってる
                     // @@htmlみたいなのはLogseqのemdeded HTML記法。前後のスペース(\u2000)忘れないでね。
                     text = text.replace(`:${emojiName}:`,
@@ -431,9 +433,34 @@ function main() {
             misskeyNoteVisibility: logseq.settings[`MisskeyNoteVisibility${logseq.settings["CurrentMisskeyProfile"][0]}`]
         };
     }
+    logseq.Editor.registerSlashCommand(
+        `misskeyに現在のブロック(current)を投稿する`,
+        async () => {
+            const {
+                isRemoveTimestamp,
+                isRemoveTask,
+                isRemoveProperty,
+                uploadExtensionAllowList,
+                _currentMisskeyProfile,
+                misskeyAccessToken,
+                misskeyHostedDomain,
+                misskeyNotePrevText,
+                misskeyNotePostText,
+                misskeyNoteVisibility
+            } = getSettings();
+            postNote(
+                misskeyAccessToken,
+                misskeyHostedDomain,
+                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + (await logseq.Editor.getCurrentBlock()).content + misskeyNotePostText.replaceAll("\\n", "\n")
+                    , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
+                misskeyNoteVisibility,
+                (await uploadMediaFromMarkdown((await logseq.Editor.getCurrentBlock()).content,
+                    misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
+            );
+        });
 
     logseq.Editor.registerSlashCommand(
-        `子ブロック(children)をmisskeyに投稿する`,
+        `misskeyに子ブロック(children)を投稿する`,
         async () => {
             const {
                 isRemoveTimestamp,
@@ -458,31 +485,7 @@ function main() {
             ));
         });
 
-    logseq.Editor.registerSlashCommand(
-        `現在のブロック(current)をmisskeyに投稿する`,
-        async () => {
-            const {
-                isRemoveTimestamp,
-                isRemoveTask,
-                isRemoveProperty,
-                uploadExtensionAllowList,
-                _currentMisskeyProfile,
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                misskeyNotePrevText,
-                misskeyNotePostText,
-                misskeyNoteVisibility
-            } = getSettings();
-            postNote(
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + (await logseq.Editor.getCurrentBlock()).content + misskeyNotePostText.replaceAll("\\n", "\n")
-                    , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
-                misskeyNoteVisibility,
-                (await uploadMediaFromMarkdown((await logseq.Editor.getCurrentBlock()).content,
-                    misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
-            );
-        });
+
 
 
     logseq.Editor.registerSlashCommand(
@@ -528,6 +531,7 @@ function main() {
                     });
 
                     if (response.status !== 200) {
+                        // FIXME: awaitする必要ないだろこれ
                         await logseq.UI.showMsg(`データの取得に失敗したノートがあります(${response.status})。ノート: ${originalURL}`, "error", { timeout: 10000 });
                         return;
                     }
@@ -543,7 +547,7 @@ function main() {
                         }
                     }
                     replaceText += "\n";
-                    const [newWidth, newHeight] = await getCorrentImageSize(data.user.avatarUrl);
+                    const [newWidth, newHeight] = await getCurrentImageSize(data.user.avatarUrl);
                     // 初期アイコンはidenticon(一度移動する必要がある)なので、それ以外の場合のみアイコンを埋め込む
                     if (new URL(data.user.avatarUrl).pathname.split('/')[1] !== 'identicon') {
                         replaceText += `\u0020@@html: <span class="avatar-${data.user.username}"></span><style>.avatar-${data.user.username}{background-image:url("${data.user.avatarUrl}");width:${newWidth * 1.3}px;height:${newHeight * 1.3}px;background-size:cover;display:inline-block;}</style>@@\u2000`
