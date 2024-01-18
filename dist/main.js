@@ -1,422 +1,422 @@
-function settingUI() {
-    /* https://logseq.github.io/plugins/types/SettingSchemaDesc.html */
-    // TODO: 自動生成。アカウント増やしてって言われたら書き直す
-    logseq.useSettingsSchema([
-        {
-            key: "",
-            title: "LogseqMisskeyPluginの設定",
-            type: "heading",
-            description: "LogseqMisskeyPluginの設定を行います。",
-            default: "",
-        },
-        {
-            key: "IsRemoveTimestamp",
-            title: "HH:MM表記の時間を削除するかどうか",
-            description: "チェックマークが入っている場合、文頭 or タスクの次にある時間(HH:MM)が投稿ノートから削除されます。(Logseqに書いてある文章に影響はありません。)",
-            type: "boolean",
-            default: false
-        },
-        {
-            key: "IsRemoveTask",
-            title: "DONEなどのタスクを削除するかどうか",
-            description: "チェックマークが入っている場合、文頭にあるタスク(`CANCELED TODO NOW LATER DONE DOING IN-PROGRESS WAITING CANCELLED WAIT`)が投稿ノートから削除されます。(Logseqに書いてある文章に影響はありません。)",
-            type: "boolean",
-            default: false
-        },
-        {
-            key: "IsRemoveProperty",
-            title: "プロパティを削除するかどうか",
-            description: "チェックマークが入っている場合、`example:: value`のように書かれているプロパティを削除します。これは文章に色などをつけている場合などいくつかの状況において自動で追記されるものでありLogseqのアプリから確認することはできません。(Logseqに書いてある文章に影響はありません。)",
-            type: "boolean",
-            default: true
-        },
-        {
-            key: "IsRemoveLogbook",
-            title: "Logbookを削除するかどうか",
-            description: "チェックマークが入っている場合、Logbookを削除します。これはNOWなどのタスクを書いたときに、経過時間をLogseqが追跡するために自動で追記されるものでありLogseqのアプリからその内容を直接確認することはできません。例えばNOWでの時間計測時に使用されるLogbookは次のような形式をとります。```\n:LOGBOOK:\n CLOCK: [2024-01-13 Sat 03:50:30]--[2024-01-13 Sat 03:50:36] =>  00:00:06\n		  CLOCK: [2024-01-13 Sat 03:50:39]--[2024-01-13 Sat 03:50:42] =>  00:00:03\n		  :END:\n```(Logseqに書いてある文章に影響はありません。)",
-            type: "boolean",
-            default: true
-        },
-        {
-            key: "uploadExtensionAllowList",
-            title: "アップロードするファイルの拡張子",
-            description: "アップロードするファイルの拡張子を指定します。カンマ区切りで複数指定できます。",
-            type: "string",
-            default: "png,jpg,jpeg,gif,mp4,webm,mp3,wav,mov"
-        },
-        {
-            key: "",
-            title: "Misskeyの設定",
-            type: "heading",
-            description: "Misskeyの設定を行います。Misskeyについては[MisskeyのGitHubリポジトリ](https://github.com/misskey-dev/misskey)をご覧ください。",
-            default: "",
-        },
-        {
-            key: "CurrentMisskeyProfile",
-            type: "enum",
-            title: "現在使用しているMisskeyアクセストークン",
-            description: "使用したいアカウントを選択してください。",
-            enumPicker: "select",
-            enumChoices: ["1つ目のアカウント", "2つ目のアカウント", "3つ目のアカウント"],
-            default: "1つ目のアカウント"
-        },
-        {
-            key: "",
-            title: "MisskeyProfile1(必須)",
-            description: "Misskeyに登録しているアカウントの1つ目の設定です",
-            type: "heading",
-        },
-        {
-            key: "MisskeyAccountMemo1",
-            title: "アカウント1についてのメモ",
-            description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-            type: "string",
-            default: ""
-        },
-        {
-            key: "MisskeyAccessToken1",
-            type: "string",
-            title: "Misskeyアクセストークン",
-            description: "1つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
-            default: ""
-        },
-        {
-            key: "MisskeyHostedDomain1",
-            type: "string",
-            title: "Misskeyがホストされているドメイン",
-            description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePrevText1",
-            type: "string",
-            title: "Misskeyノートの前につける文字列",
-            description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePostText1",
-            type: "string",
-            title: "Misskeyノートの後につける文字列",
-            description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNoteVisibility1",
-            type: "enum",
-            title: "Misskeyノートの公開範囲",
-            description: "Misskeyノートの公開範囲を選択してください。",
-            enumPicker: "select",
-            enumChoices: ["public", "home", "followers"],
-            default: "public"
-        }, {
-            key: "",
-            title: "MisskeyProfile2(任意)",
-            description: "Misskeyに登録しているアカウントの2つ目の設定です",
-            type: "heading",
-        },
-        {
-            key: "MisskeyAccountMemo2",
-            title: "アカウント2についてのメモ",
-            description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-            type: "string",
-            default: ""
-        },
-        {
-            key: "MisskeyAccessToken2",
-            type: "string",
-            title: "Misskeyアクセストークン",
-            description: "2つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
-            default: ""
-        },
-        {
-            key: "MisskeyHostedDomain2",
-            type: "string",
-            title: "Misskeyがホストされているドメイン",
-            description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePrevText2",
-            type: "string",
-            title: "Misskeyノートの前につける文字列",
-            description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePostText2",
-            type: "string",
-            title: "Misskeyノートの後につける文字列",
-            description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNoteVisibility2",
-            type: "enum",
-            title: "Misskeyノートの公開範囲",
-            description: "Misskeyノートの公開範囲を選択してください。",
-            enumPicker: "select",
-            enumChoices: ["public", "home", "followers"],
-            default: "public"
-        }, {
-            key: "",
-            title: "MisskeyProfile3(任意)",
-            description: "Misskeyに登録しているアカウントの1つ目の設定です",
-            type: "heading",
-        },
-        {
-            key: "MisskeyAccountMemo3",
-            title: "アカウント3についてのメモ",
-            description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-            type: "string",
-            default: ""
-        },
-        {
-            key: "MisskeyAccessToken3",
-            type: "string",
-            title: "Misskeyアクセストークン",
-            description: "3つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
-            default: ""
-        },
-        {
-            key: "MisskeyHostedDomain3",
-            type: "string",
-            title: "Misskeyがホストされているドメイン",
-            description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePrevText3",
-            type: "string",
-            title: "Misskeyノートの前につける文字列",
-            description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNotePostText3",
-            type: "string",
-            title: "Misskeyノートの後につける文字列",
-            description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-            default: ""
-        },
-        {
-            key: "MisskeyNoteVisibility3",
-            type: "enum",
-            title: "Misskeyノートの公開範囲",
-            description: "Misskeyノートの公開範囲を選択してください。",
-            enumPicker: "select",
-            enumChoices: ["public", "home", "followers"],
-            default: "public"
-        },
-    ]);
-};
+function main() {
+    function settingUI() {
+        /* https://logseq.github.io/plugins/types/SettingSchemaDesc.html */
+        // TODO: 自動生成。アカウント増やしてって言われたら書き直す
+        logseq.useSettingsSchema([
+            {
+                key: "",
+                title: "LogseqMisskeyPluginの設定",
+                type: "heading",
+                description: "LogseqMisskeyPluginの設定を行います。",
+                default: "",
+            },
+            {
+                key: "IsRemoveTimestamp",
+                title: "HH:MM表記の時間を削除するかどうか",
+                description: "チェックマークが入っている場合、文頭 or タスクの次にある時間(HH:MM)が投稿ノートから削除されます。(Logseqに書いてある文章に影響はありません。)",
+                type: "boolean",
+                default: false
+            },
+            {
+                key: "IsRemoveTask",
+                title: "DONEなどのタスクを削除するかどうか",
+                description: "チェックマークが入っている場合、文頭にあるタスク(`CANCELED TODO NOW LATER DONE DOING IN-PROGRESS WAITING CANCELLED WAIT`)が投稿ノートから削除されます。(Logseqに書いてある文章に影響はありません。)",
+                type: "boolean",
+                default: false
+            },
+            {
+                key: "IsRemoveProperty",
+                title: "プロパティを削除するかどうか",
+                description: "チェックマークが入っている場合、`example:: value`のように書かれているプロパティを削除します。これは文章に色などをつけている場合などいくつかの状況において自動で追記されるものでありLogseqのアプリから確認することはできません。(Logseqに書いてある文章に影響はありません。)",
+                type: "boolean",
+                default: true
+            },
+            {
+                key: "IsRemoveLogbook",
+                title: "Logbookを削除するかどうか",
+                description: "チェックマークが入っている場合、Logbookを削除します。これはNOWなどのタスクを書いたときに、経過時間をLogseqが追跡するために自動で追記されるものでありLogseqのアプリからその内容を直接確認することはできません。例えばNOWでの時間計測時に使用されるLogbookは次のような形式をとります。```\n:LOGBOOK:\n CLOCK: [2024-01-13 Sat 03:50:30]--[2024-01-13 Sat 03:50:36] =>  00:00:06\n		  CLOCK: [2024-01-13 Sat 03:50:39]--[2024-01-13 Sat 03:50:42] =>  00:00:03\n		  :END:\n```(Logseqに書いてある文章に影響はありません。)",
+                type: "boolean",
+                default: true
+            },
+            {
+                key: "uploadExtensionAllowList",
+                title: "アップロードするファイルの拡張子",
+                description: "アップロードするファイルの拡張子を指定します。カンマ区切りで複数指定できます。",
+                type: "string",
+                default: "png,jpg,jpeg,gif,mp4,webm,mp3,wav,mov"
+            },
+            {
+                key: "",
+                title: "Misskeyの設定",
+                type: "heading",
+                description: "Misskeyの設定を行います。Misskeyについては[MisskeyのGitHubリポジトリ](https://github.com/misskey-dev/misskey)をご覧ください。",
+                default: "",
+            },
+            {
+                key: "CurrentMisskeyProfile",
+                type: "enum",
+                title: "現在使用しているMisskeyアクセストークン",
+                description: "使用したいアカウントを選択してください。",
+                enumPicker: "select",
+                enumChoices: ["1つ目のアカウント", "2つ目のアカウント", "3つ目のアカウント"],
+                default: "1つ目のアカウント"
+            },
+            {
+                key: "",
+                title: "MisskeyProfile1(必須)",
+                description: "Misskeyに登録しているアカウントの1つ目の設定です",
+                type: "heading",
+            },
+            {
+                key: "MisskeyAccountMemo1",
+                title: "アカウント1についてのメモ",
+                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
+                type: "string",
+                default: ""
+            },
+            {
+                key: "MisskeyAccessToken1",
+                type: "string",
+                title: "Misskeyアクセストークン",
+                description: "1つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                default: ""
+            },
+            {
+                key: "MisskeyHostedDomain1",
+                type: "string",
+                title: "Misskeyがホストされているドメイン",
+                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePrevText1",
+                type: "string",
+                title: "Misskeyノートの前につける文字列",
+                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePostText1",
+                type: "string",
+                title: "Misskeyノートの後につける文字列",
+                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNoteVisibility1",
+                type: "enum",
+                title: "Misskeyノートの公開範囲",
+                description: "Misskeyノートの公開範囲を選択してください。",
+                enumPicker: "select",
+                enumChoices: ["public", "home", "followers"],
+                default: "public"
+            }, {
+                key: "",
+                title: "MisskeyProfile2(任意)",
+                description: "Misskeyに登録しているアカウントの2つ目の設定です",
+                type: "heading",
+            },
+            {
+                key: "MisskeyAccountMemo2",
+                title: "アカウント2についてのメモ",
+                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
+                type: "string",
+                default: ""
+            },
+            {
+                key: "MisskeyAccessToken2",
+                type: "string",
+                title: "Misskeyアクセストークン",
+                description: "2つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                default: ""
+            },
+            {
+                key: "MisskeyHostedDomain2",
+                type: "string",
+                title: "Misskeyがホストされているドメイン",
+                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePrevText2",
+                type: "string",
+                title: "Misskeyノートの前につける文字列",
+                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePostText2",
+                type: "string",
+                title: "Misskeyノートの後につける文字列",
+                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNoteVisibility2",
+                type: "enum",
+                title: "Misskeyノートの公開範囲",
+                description: "Misskeyノートの公開範囲を選択してください。",
+                enumPicker: "select",
+                enumChoices: ["public", "home", "followers"],
+                default: "public"
+            }, {
+                key: "",
+                title: "MisskeyProfile3(任意)",
+                description: "Misskeyに登録しているアカウントの1つ目の設定です",
+                type: "heading",
+            },
+            {
+                key: "MisskeyAccountMemo3",
+                title: "アカウント3についてのメモ",
+                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
+                type: "string",
+                default: ""
+            },
+            {
+                key: "MisskeyAccessToken3",
+                type: "string",
+                title: "Misskeyアクセストークン",
+                description: "3つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](TODO) をご覧ください。",
+                default: ""
+            },
+            {
+                key: "MisskeyHostedDomain3",
+                type: "string",
+                title: "Misskeyがホストされているドメイン",
+                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePrevText3",
+                type: "string",
+                title: "Misskeyノートの前につける文字列",
+                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNotePostText3",
+                type: "string",
+                title: "Misskeyノートの後につける文字列",
+                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
+                default: ""
+            },
+            {
+                key: "MisskeyNoteVisibility3",
+                type: "enum",
+                title: "Misskeyノートの公開範囲",
+                description: "Misskeyノートの公開範囲を選択してください。",
+                enumPicker: "select",
+                enumChoices: ["public", "home", "followers"],
+                default: "public"
+            },
+        ]);
+    };
 
 
-async function uploadMediaFromMarkdown(markdownText, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList) {
-    // ![alt](path)をすべて検索する
-    const matches = markdownText.matchAll(/!\[(.*?)\]\((.*?)\)/g);
+    async function uploadMediaFromMarkdown(markdownText, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList) {
+        // ![alt](path)をすべて検索する
+        const matches = markdownText.matchAll(/!\[(.*?)\]\((.*?)\)/g);
 
-    let imageIDList = [];
+        let imageIDList = [];
 
-    await Promise.all(Array.from(matches).map(async match => {
-        if (match[2].startsWith("data:") || match[2].startsWith("http://") || match[2].startsWith("https://")) {
-            return;
-        }
-
-        try {
-            const filePath = `file://${(await logseq.App.getCurrentGraph()).path}/${match[2].replace(/\.\.\//, "")}`;
-            const fileExtension = filePath.split('.').pop().toLowerCase();
-
-            if (!uploadExtensionAllowList.includes(fileExtension)) {
-                await logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
+        await Promise.all(Array.from(matches).map(async match => {
+            if (match[2].startsWith("data:") || match[2].startsWith("http://") || match[2].startsWith("https://")) {
                 return;
             }
-            const response = await fetch(filePath);
-            const blob = await response.blob();
 
-            await logseq.UI.showMsg("アップロード中...", "success", { timeout: 3000 });
-
-            let formData = new FormData();
-            formData.append('i', misskeyAccessToken);
-            formData.append('file', blob, match[1]);
-
-            const uploadResponse = await fetch(`https://${misskeyHostedDomain}/api/drive/files/create`, {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await uploadResponse.json();
-            let message = data.error ? ("Error:" + data.error.message) : ("アップロード完了!");
-            logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
-
-            if (!data.error) {
-                imageIDList.push(data.id);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            logseq.UI.showMsg('Error:' + error.toString(), "error", { timeout: 3000 });
-        }
-    }));
-
-    return imageIDList;
-}
-
-
-function postNote(accessToken, misskeyHostedDomain, note, noteVisibility = "public", fileIds = []) {
-    if (misskeyHostedDomain === "" || accessToken === "") {
-        logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
-        return;
-    }
-    let bodyObject = {
-        i: accessToken,
-        text: note,
-        visibility: noteVisibility
-    };
-    if (fileIds.length > 0) {
-        bodyObject.fileIds = fileIds;
-    }
-
-    fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify(bodyObject)
-    })
-        .then(response => response.json())
-        .then(data => {
-            let message = data.error ? ("Error:" + data.error.message) : ("ノートを送信しました。")
-            logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
-
-            return data;
-        }).catch((error) => {
-            console.error('Error:', error);
-            logseq.UI.showMsg('Error:' + error.toString(), { timeout: 3000 });
-        });
-}
-
-
-async function getBlockContentFromBlocks(blocks) {
-    let contents = [];
-    async function searchBlocks(blocks) {
-        for (const [_, blockUUID] of blocks) {
-            const block = await logseq.Editor.getBlock(blockUUID);
-            contents.push(block);
-
-            if (block.children.length > 0) {
-                await searchBlocks(block.children);
-            }
-        }
-    }
-    await searchBlocks(blocks);
-    return contents;
-}
-
-
-function normalizeText(text, isRemoveTimestamp, isRemoveTask, isRemoveProperty) {
-    const taskKeywords = [
-        "CANCELED", "TODO", "NOW", "LATER", "DONE", "DOING", "IN-PROGRESS",
-        "WAITING", "CANCELLED", "WAIT"
-    ];
-    // 数字2桁:数字2桁を検索する
-    const timestampRegex = /\b\d{2}:\d{2}\b/;
-    // プロパティ(hoge:: fuga形式、色付けやidの管理時に作成されている)を検索する
-    const propertyRegex = /^.+:: .+/;
-    // httpから始まらない画像のURLを検索する
-    const imageRegex = /!\[.*?\]\((?!http)(.*?)\)/g;
-    // LOGBOOKを削除します。これはNOWなどで時間経過を記録するために使用されています。
-    text = text.replaceAll(/:LOGBOOK:([\s\S]*?):END:/g, '')
-
-    return text.split('\n').map(line => {
-        line = line.replace(imageRegex, '');
-        // {{コマンド テキスト}} を テキスト に変換します。これはYouTubeやTwitterの埋め込みを行うために使用されています。
-        line = line.replace(/\{\{.*?\s(.*?)\}\}/g, '$1')
-
-        if (isRemoveProperty && propertyRegex.test(line)) {
-            return '';
-        }
-
-        const taskKeyword = taskKeywords.find(keyword => line.startsWith(keyword));
-        if (isRemoveTask && taskKeyword) {
-            line = line.substring(taskKeyword.length).trim();
-        }
-
-        if (isRemoveTimestamp && timestampRegex.test(line)) {
-            line = line.replace(timestampRegex, '').trim();
-        }
-
-        return line;
-    }).filter(line => line !== '').join('\n');
-}
-
-// FIXME: ↓画像のサイズを文字と同じ大きさにしたいので
-//   こうやってfontSizeを取得してるるけど、多分もっといい方法がある
-async function getCorrentImageSize(imageUrl) {
-    // 一時的なtextarea要素を作成する
-    let tempTextarea = document.createElement("textarea");
-
-    // 一時的なtextareaをbodyに追加する
-    document.body.appendChild(tempTextarea);
-
-    // 計算されたスタイルを取得して、フォントサイズを調べる
-    const fontSize = window.getComputedStyle(tempTextarea).fontSize;
-
-    // 一時的なtextareaを破棄する
-    document.body.removeChild(tempTextarea);
-
-    const image = await new Promise((resolve, reject) => {
-        let img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`画像の読み込みに失敗しました: ${imageUrl}`));
-        img.src = imageUrl;
-    });
-    let aspectRatio = image.width / image.height;
-    let newHeight = parseFloat(fontSize) * 2;
-    let newWidth = newHeight * aspectRatio;
-
-    return [newWidth, newHeight]
-}
-
-
-
-async function parseMisskeyEmoji(text, emojiHostedDomain, emojis) {
-    const emojiRegex = /:(\w+):/g;
-    let promises = [];
-
-    let match;
-    while ((match = emojiRegex.exec(text)) !== null) {
-        const emojiName = match[1];
-        const url = `https://${emojiHostedDomain}/api/emoji?name=${emojiName}`;
-        const promise = (async () => {
             try {
-                let imageUrl = "";
-                if (Object.keys(emojis).includes(emojiName)) {
-                    imageUrl = emojis[emojiName];
-                } else {
-                    const response = await fetch(url);
-                    if (response.status !== 200) {
-                        return text;
-                    }
-                    const data = await response.json();
-                    imageUrl = data.url;
-                }
+                const filePath = `file://${(await logseq.App.getCurrentGraph()).path}/${match[2].replace(/\.\.\//, "")}`;
+                const fileExtension = filePath.split('.').pop().toLowerCase();
 
-                const [newWidth, newHeight] = await getCorrentImageSize(imageUrl);
-                // imgタグは(おそらく)logseqにより制御されており、よくわからん動き方をするのでこんなになってる
-                // @@htmlみたいなのはLogseqのemdeded HTML記法。前後のスペース(\u2000)忘れないでね。
-                text = text.replace(`:${emojiName}:`,
-                    `\u0020@@html: <span class="emoji-${emojiName}"></span><style>.emoji-${emojiName}{background-image:url("${imageUrl}");width:${newWidth}px;height:${newHeight}px;background-size:cover;display:inline-block;}</style>@@\u2000`);
+                if (!uploadExtensionAllowList.includes(fileExtension)) {
+                    await logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
+                    return;
+                }
+                const response = await fetch(filePath);
+                const blob = await response.blob();
+
+                await logseq.UI.showMsg("アップロード中...", "success", { timeout: 3000 });
+
+                let formData = new FormData();
+                formData.append('i', misskeyAccessToken);
+                formData.append('file', blob, match[1]);
+
+                const uploadResponse = await fetch(`https://${misskeyHostedDomain}/api/drive/files/create`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await uploadResponse.json();
+                let message = data.error ? ("Error:" + data.error.message) : ("アップロード完了!");
+                logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
+
+                if (!data.error) {
+                    imageIDList.push(data.id);
+                }
             } catch (error) {
-                console.error('Error fetching emoji:', error);
+                console.error('Error:', error);
+                logseq.UI.showMsg('Error:' + error.toString(), "error", { timeout: 3000 });
             }
-        })();
-        promises.push(promise);
+        }));
+
+        return imageIDList;
     }
 
-    await Promise.all(promises);
-    return text;
-}
+
+    function postNote(accessToken, misskeyHostedDomain, note, noteVisibility = "public", fileIds = []) {
+        if (misskeyHostedDomain === "" || accessToken === "") {
+            logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
+            return;
+        }
+        let bodyObject = {
+            i: accessToken,
+            text: note,
+            visibility: noteVisibility
+        };
+        if (fileIds.length > 0) {
+            bodyObject.fileIds = fileIds;
+        }
+
+        fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', },
+            body: JSON.stringify(bodyObject)
+        })
+            .then(response => response.json())
+            .then(data => {
+                let message = data.error ? ("Error:" + data.error.message) : ("ノートを送信しました。")
+                logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
+
+                return data;
+            }).catch((error) => {
+                console.error('Error:', error);
+                logseq.UI.showMsg('Error:' + error.toString(), { timeout: 3000 });
+            });
+    }
 
 
-function main() {
+    async function getBlockContentFromBlocks(blocks) {
+        let contents = [];
+        async function searchBlocks(blocks) {
+            for (const [_, blockUUID] of blocks) {
+                const block = await logseq.Editor.getBlock(blockUUID);
+                contents.push(block);
+
+                if (block.children.length > 0) {
+                    await searchBlocks(block.children);
+                }
+            }
+        }
+        await searchBlocks(blocks);
+        return contents;
+    }
+
+
+    function normalizeText(text, isRemoveTimestamp, isRemoveTask, isRemoveProperty) {
+        const taskKeywords = [
+            "CANCELED", "TODO", "NOW", "LATER", "DONE", "DOING", "IN-PROGRESS",
+            "WAITING", "CANCELLED", "WAIT"
+        ];
+        // 数字2桁:数字2桁を検索する
+        const timestampRegex = /\b\d{2}:\d{2}\b/;
+        // プロパティ(hoge:: fuga形式、色付けやidの管理時に作成されている)を検索する
+        const propertyRegex = /^.+:: .+/;
+        // httpから始まらない画像のURLを検索する
+        const imageRegex = /!\[.*?\]\((?!http)(.*?)\)/g;
+        // LOGBOOKを削除します。これはNOWなどで時間経過を記録するために使用されています。
+        text = text.replaceAll(/:LOGBOOK:([\s\S]*?):END:/g, '')
+
+        return text.split('\n').map(line => {
+            line = line.replace(imageRegex, '');
+            // {{コマンド テキスト}} を テキスト に変換します。これはYouTubeやTwitterの埋め込みを行うために使用されています。
+            line = line.replace(/\{\{.*?\s(.*?)\}\}/g, '$1')
+
+            if (isRemoveProperty && propertyRegex.test(line)) {
+                return '';
+            }
+
+            const taskKeyword = taskKeywords.find(keyword => line.startsWith(keyword));
+            if (isRemoveTask && taskKeyword) {
+                line = line.substring(taskKeyword.length).trim();
+            }
+
+            if (isRemoveTimestamp && timestampRegex.test(line)) {
+                line = line.replace(timestampRegex, '').trim();
+            }
+
+            return line;
+        }).filter(line => line !== '').join('\n');
+    }
+
+    // FIXME: ↓画像のサイズを文字と同じ大きさにしたいので
+    //   こうやってfontSizeを取得してるるけど、多分もっといい方法がある
+    async function getCorrentImageSize(imageUrl) {
+        // 一時的なtextarea要素を作成する
+        let tempTextarea = document.createElement("textarea");
+
+        // 一時的なtextareaをbodyに追加する
+        document.body.appendChild(tempTextarea);
+
+        // 計算されたスタイルを取得して、フォントサイズを調べる
+        const fontSize = window.getComputedStyle(tempTextarea).fontSize;
+
+        // 一時的なtextareaを破棄する
+        document.body.removeChild(tempTextarea);
+
+        const image = await new Promise((resolve, reject) => {
+            let img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error(`画像の読み込みに失敗しました: ${imageUrl}`));
+            img.src = imageUrl;
+        });
+        let aspectRatio = image.width / image.height;
+        let newHeight = parseFloat(fontSize) * 2;
+        let newWidth = newHeight * aspectRatio;
+
+        return [newWidth, newHeight]
+    }
+
+
+
+    async function parseMisskeyEmoji(text, emojiHostedDomain, emojis) {
+        const emojiRegex = /:(\w+):/g;
+        let promises = [];
+
+        let match;
+        while ((match = emojiRegex.exec(text)) !== null) {
+            const emojiName = match[1];
+            const url = `https://${emojiHostedDomain}/api/emoji?name=${emojiName}`;
+            const promise = (async () => {
+                try {
+                    let imageUrl = "";
+                    if (Object.keys(emojis).includes(emojiName)) {
+                        imageUrl = emojis[emojiName];
+                    } else {
+                        const response = await fetch(url);
+                        if (response.status !== 200) {
+                            return text;
+                        }
+                        const data = await response.json();
+                        imageUrl = data.url;
+                    }
+
+                    const [newWidth, newHeight] = await getCorrentImageSize(imageUrl);
+                    // imgタグは(おそらく)logseqにより制御されており、よくわからん動き方をするのでこんなになってる
+                    // @@htmlみたいなのはLogseqのemdeded HTML記法。前後のスペース(\u2000)忘れないでね。
+                    text = text.replace(`:${emojiName}:`,
+                        `\u0020@@html: <span class="emoji-${emojiName}"></span><style>.emoji-${emojiName}{background-image:url("${imageUrl}");width:${newWidth}px;height:${newHeight}px;background-size:cover;display:inline-block;}</style>@@\u2000`);
+                } catch (error) {
+                    console.error('Error fetching emoji:', error);
+                }
+            })();
+            promises.push(promise);
+        }
+
+        await Promise.all(promises);
+        return text;
+    }
+
+
     settingUI();
     function getSettings() {
         return {
