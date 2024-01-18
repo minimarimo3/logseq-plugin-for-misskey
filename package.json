@@ -1,7 +1,7 @@
 {
   "name": "logseq-plugin-for-misskey",
   "version": "v1.0.2",
-  "main": "index.js",
+  "main": "index.html",
   "author": "minimarimo3",
   "description": "LogseqからMisskeyにノートを投稿したりLogseqにノートを埋め込んだりを可能にします",
   "license": "MIT",
