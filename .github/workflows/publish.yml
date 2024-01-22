@@ -22,7 +22,7 @@ jobs:
         id: build
         run: |
           mkdir ${{ env.PLUGIN_NAME }}
-          cp -r document dist index.html icon_ki.png README.md package.json ${{ env.PLUGIN_NAME }}
+          cp -r dist index.html icon_ki.png README.md package.json ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}-${{ env.tag_name }}.zip ${{ env.PLUGIN_NAME }}
           ls
 
@@ -42,7 +42,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./${{ env.PLUGIN_NAME }}-${{ env.tag_name }}.zip, ./package.json
-          tag_name: ${{ steps.build.outputs.tag_name }}
+          tag_name: ${{ env.tag_name }}
           name: ${{ env.PLUGIN_NAME }}-${{ env.tag_name }}
           body: Release ${{ env.tag_name }}
         env:
