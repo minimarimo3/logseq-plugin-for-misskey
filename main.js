@@ -209,27 +209,27 @@ function main() {
                 enumChoices: ["public", "home", "followers"],
             },
         ]);
-    };
+    }
 
 
     async function uploadMediaFromMarkdown(markdownText, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList) {
         // ![alt](path)をすべて検索する
-        const matches = markdownText.matchAll(/!\[(.*?)\]\((.*?)\)/g);
+        const matches = markdownText.matchAll(/!\[(.*?)]\((.*?)\)/g);
 
         let imageIDList = [];
 
         await Promise.all(Array.from(matches).map(async match => {
-            if (match[2].startsWith("data:") || match[2].startsWith("http://") || match[2].startsWith("https://")) {
+            if (/^(data:|https?:\/\/)/.test(match[2])) {
                 return;
             }
+
 
             try {
                 const filePath = `file://${(await logseq.App.getCurrentGraph()).path}/${match[2].replace(/\.\.\//, "")}`;
                 const fileExtension = filePath.split('.').pop().toLowerCase();
 
                 if (!uploadExtensionAllowList.includes(fileExtension)) {
-                    // FIXME: awaitする必要ないだろこれ
-                    await logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
+                    logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
                     return;
                 }
                 const response = await fetch(filePath);
@@ -263,7 +263,7 @@ function main() {
     }
 
 
-    function postNote(accessToken, misskeyHostedDomain, note, noteVisibility = "public", fileIds = []) {
+    async function postNote(accessToken, misskeyHostedDomain, note, {noteVisibility = "public", replyId=undefined, fileIds = []} = {}) {
         if (misskeyHostedDomain === "" || accessToken === "") {
             logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
             return;
@@ -273,11 +273,10 @@ function main() {
             text: note,
             visibility: noteVisibility
         };
-        if (fileIds.length > 0) {
-            bodyObject.fileIds = fileIds;
-        }
+        if (fileIds.length > 0) { bodyObject.fileIds = fileIds; }
+        if (replyId !== undefined){ bodyObject.replyId = replyId; }
 
-        fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
+        return await fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', },
             body: JSON.stringify(bodyObject)
@@ -295,21 +294,29 @@ function main() {
     }
 
 
-    async function getBlockContentFromBlocks(blocks) {
-        let contents = [];
-        // blockの投稿順序がどうでもいいこと前提
-        async function searchBlocks(blocks) {
-            for (const [_, blockUUID] of blocks) {
-                const block = await logseq.Editor.getBlock(blockUUID);
-                contents.push(block);
 
-                if (block.children.length > 0) {
-                    await searchBlocks(block.children);
-                }
-            }
-        }
-        await searchBlocks(blocks);
-        return contents;
+    async function postNoteC(note, {replyId=undefined, fileIds = []} = {}) {
+
+        const isRemoveTimestamp= logseq.settings["IsRemoveTimestamp"];
+        const isRemoveTask= logseq.settings["IsRemoveTask"];
+        const isRemoveProperty= logseq.settings["IsRemoveProperty"];
+        const uploadExtensionAllowList= logseq.settings["uploadExtensionAllowList"].replace(/\s+/g, '').split(",");
+        const currentMisskeyProfile= logseq.settings["CurrentMisskeyProfile"][0];
+        const misskeyAccessToken= logseq.settings[`MisskeyAccessToken${currentMisskeyProfile}`];
+        const misskeyHostedDomain= logseq.settings[`MisskeyHostedDomain${currentMisskeyProfile}`];
+        const misskeyNotePrevText= logseq.settings[`MisskeyNotePrevText${currentMisskeyProfile}`];
+        const misskeyNotePostText= logseq.settings[`MisskeyNotePostText${currentMisskeyProfile}`];
+        const misskeyNoteVisibility= logseq.settings[`MisskeyNoteVisibility${currentMisskeyProfile}`];
+
+        let postNoteContent = normalizeText(
+            misskeyNotePrevText.replaceAll("\\n", "\n") + note + misskeyNotePostText.replace("\\n", "\n"),
+            isRemoveTimestamp, isRemoveTask, isRemoveProperty);
+
+        return postNote(misskeyAccessToken, misskeyHostedDomain, postNoteContent, {
+            noteVisibility: misskeyNoteVisibility,
+            replyId: replyId,
+            fileIds: fileIds.concat(await uploadMediaFromMarkdown(note, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
+        });
     }
 
 
@@ -323,14 +330,14 @@ function main() {
         // プロパティ(hoge:: fuga形式、色付けやidの管理時に作成されている)を検索する
         const propertyRegex = /^.+:: .+/;
         // httpから始まらない画像のURLを検索する
-        const imageRegex = /!\[.*?\]\((?!http)(.*?)\)/g;
+        const imageRegex = /!\[.*?]\((?!http)(.*?)\)/g;
         // LOGBOOKを削除します。これはNOWなどで時間経過を記録するために使用されています。
         text = text.replaceAll(/:LOGBOOK:([\s\S]*?):END:/g, '')
 
         return text.split('\n').map(line => {
             line = line.replace(imageRegex, '');
             // {{コマンド テキスト}} を テキスト に変換します。これはYouTubeやTwitterの埋め込みを行うために使用されています。
-            line = line.replace(/\{\{.*?\s(.*?)\}\}/g, '$1')
+            line = line.replace(/\{\{.*?\s(.*?)}}/g, '$0')
 
             if (isRemoveProperty && propertyRegex.test(line)) {
                 return '';
@@ -348,6 +355,8 @@ function main() {
             return line;
         }).filter(line => line !== '').join('\n');
     }
+
+
 
     // FIXME: ↓画像のサイズを文字と同じ大きさにしたいので
     //   こうやってfontSizeを取得してるるけど、多分もっといい方法がある
@@ -403,7 +412,7 @@ function main() {
 
                     const [newWidth, newHeight] = await getCurrentImageSize(imageUrl);
                     // imgタグは(おそらく)logseqにより制御されており、よくわからん動き方をするのでこんなになってる
-                    // @@htmlみたいなのはLogseqのemdeded HTML記法。前後のスペース(\u2000)忘れないでね。
+                    // @@htmlみたいなのはLogseqのembed HTML記法。前後のスペース(\u2000)忘れないでね。
                     text = text.replace(`:${emojiName}:`,
                         `\u0020@@html: <span class="emoji-${emojiName}"></span><style>.emoji-${emojiName}{background-image:url("${imageUrl}");width:${newWidth}px;height:${newHeight}px;background-size:cover;display:inline-block;}</style>@@\u2000`);
                 } catch (error) {
@@ -433,75 +442,47 @@ function main() {
             misskeyNoteVisibility: logseq.settings[`MisskeyNoteVisibility${logseq.settings["CurrentMisskeyProfile"][0]}`]
         };
     }
+
     logseq.Editor.registerSlashCommand(
         `misskeyに現在のブロック(current)を投稿する`,
         async () => {
-            const {
-                isRemoveTimestamp,
-                isRemoveTask,
-                isRemoveProperty,
-                uploadExtensionAllowList,
-                _currentMisskeyProfile,
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                misskeyNotePrevText,
-                misskeyNotePostText,
-                misskeyNoteVisibility
-            } = getSettings();
-            postNote(
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + (await logseq.Editor.getCurrentBlock()).content + misskeyNotePostText.replaceAll("\\n", "\n")
-                    , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
-                misskeyNoteVisibility,
-                (await uploadMediaFromMarkdown((await logseq.Editor.getCurrentBlock()).content,
-                    misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
-            );
+            postNoteC((await logseq.Editor.getCurrentBlock()).content);
         });
 
     logseq.Editor.registerSlashCommand(
-        `misskeyに子ブロック(children)を投稿する`,
+        `misskeyに子ブロック(children)をツリーとして投稿する`,
         async () => {
-            const {
-                isRemoveTimestamp,
-                isRemoveTask,
-                isRemoveProperty,
-                uploadExtensionAllowList,
-                _currentMisskeyProfile,
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                misskeyNotePrevText,
-                misskeyNotePostText,
-                misskeyNoteVisibility
-            } = getSettings();
-            let contents = await getBlockContentFromBlocks((await logseq.Editor.getCurrentBlock()).children);
-            contents.map(async content => postNote(
-                misskeyAccessToken,
-                misskeyHostedDomain,
-                normalizeText(misskeyNotePrevText.replaceAll("\\n", "\n") + content.content + misskeyNotePostText.replaceAll("\\n", "\n")
-                    , isRemoveTimestamp, isRemoveTask, isRemoveProperty),
-                misskeyNoteVisibility,
-                (await uploadMediaFromMarkdown(content.content, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList))
-            ));
-        });
+            async function searchBlocks(a_blocks, replyNoteId=undefined) {
+                for (const blockUUID of a_blocks) {
+                    const block = await logseq.Editor.getBlock(blockUUID);
+                    let postedNoteID;
+                    if (replyNoteId !== undefined){
+                        postedNoteID = (await postNoteC(block.content, { replyId: replyNoteId })).createdNote.id;
+                    } else {
+                        postedNoteID = (await postNoteC(block.content)).createdNote.id;
+                    }
 
+                    if (block?.children && block.children.length > 0) {
+                        // childrenが存在する場合は、そのブロックIDの配列を渡す
+                        await searchBlocks(block.children.map(([_, uuid]) => uuid), postedNoteID);
+                    }
+                }
+            }
 
+            const replyId = (await postNoteC((await logseq.Editor.getCurrentBlock()).content)).createdNote.id;
+            await searchBlocks((await logseq.Editor.getCurrentBlock()).children.map(([_, uuid]) => uuid), replyId);
+        }
+    );
 
 
     logseq.Editor.registerSlashCommand(
         `misskeyのノート(note)を埋め込む`,
         async () => {
             const {
-                _isRemoveTimestamp,
-                _isRemoveTask,
-                _isRemoveProperty,
-                _uploadExtensionAllowList,
-                _currentMisskeyProfile,
+                _isRemoveTimestamp, _isRemoveTask, _isRemoveProperty, _uploadExtensionAllowList, _currentMisskeyProfile,
                 misskeyAccessToken,
                 misskeyHostedDomain,
-                _misskeyNotePrevText,
-                _misskeyNotePostText,
-                _misskeyNoteVisibility
+                _misskeyNotePrevText, _misskeyNotePostText, _misskeyNoteVisibility
             } = getSettings();
 
             const block = await logseq.Editor.getCurrentBlock();
@@ -521,7 +502,7 @@ function main() {
                     let bodyObject = {
                         noteId: noteId
                     };
-                    if (misskeyDomain == misskeyHostedDomain) {
+                    if (misskeyDomain === misskeyHostedDomain) {
                         bodyObject.i = misskeyAccessToken;
                     }
                     const response = await fetch(`https://${misskeyDomain}/api/notes/show`, {
@@ -531,8 +512,7 @@ function main() {
                     });
 
                     if (response.status !== 200) {
-                        // FIXME: awaitする必要ないだろこれ
-                        await logseq.UI.showMsg(`データの取得に失敗したノートがあります(${response.status})。ノート: ${originalURL}`, "error", { timeout: 10000 });
+                        logseq.UI.showMsg(`データの取得に失敗したノートがあります(${response.status})。ノート: ${originalURL}`, "error", { timeout: 10000 });
                         return;
                     }
                     const data = await response.json();
@@ -559,7 +539,6 @@ function main() {
                     return [originalURL, replaceText];
                 } catch (error) {
                     console.error('Error:', error);
-                    return;
                 }
             });
 
