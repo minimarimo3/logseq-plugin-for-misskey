@@ -1,12 +1,12 @@
 {
-  "name": "logseq-plugin-for-misskey-for-debug",
+  "name": "logseq-plugin-for-misskey",
   "version": "v1.0.8",
   "main": "index.html",
   "author": "minimarimo3",
   "description": "LogseqからMisskeyにノートを投稿したりLogseqにノートを埋め込んだりを可能にします",
   "license": "MIT",
   "logseq": {
-    "id": "logseq-plugin-for-misskey-for-debug",
+    "id": "logseq-plugin-for-misskey",
     "title": "Misskey Plugin",
     "icon": "icon_ki.png"
   }

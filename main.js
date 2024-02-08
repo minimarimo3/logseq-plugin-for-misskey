@@ -325,8 +325,8 @@ function main() {
             "CANCELED", "TODO", "NOW", "LATER", "DONE", "DOING", "IN-PROGRESS",
             "WAITING", "CANCELLED", "WAIT"
         ];
-        // 数字1桁:数字2桁を検索する
-        const timestampRegex = /\b\d:\d{2}\b/;
+        // 数字2桁:数字2桁を検索する
+        const timestampRegex = /\b\d{2}:\d{2}\b/;
         // プロパティ(hoge:: fuga形式、色付けやidの管理時に作成されている)を検索する
         const propertyRegex = /^.+:: .+/;
         // httpから始まらない画像のURLを検索する
