@@ -209,12 +209,12 @@ function main() {
                 enumChoices: ["public", "home", "followers"],
             },
         ]);
-    };
+    }
 
 
     async function uploadMediaFromMarkdown(markdownText, misskeyAccessToken, misskeyHostedDomain, uploadExtensionAllowList) {
         // ![alt](path)をすべて検索する
-        const matches = markdownText.matchAll(/!\[(.*?)\]\((.*?)\)/g);
+        const matches = markdownText.matchAll(/!\[(.*?)]\((.*?)\)/g);
 
         let imageIDList = [];
 
@@ -263,7 +263,8 @@ function main() {
     }
 
 
-    function postNote(accessToken, misskeyHostedDomain, note, noteVisibility = "public", fileIds = []) {
+    async function postNote(accessToken, misskeyHostedDomain, note, noteVisibility = "public", fileIds = []) {
+        // repliesNoteとほぼ同じ処理だが、APIのURLや投げるJSONが少し違うので別にしている
         if (misskeyHostedDomain === "" || accessToken === "") {
             logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
             return;
@@ -277,7 +278,42 @@ function main() {
             bodyObject.fileIds = fileIds;
         }
 
-        fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
+        // FIXME: https
+        return await fetch(`http://${misskeyHostedDomain}/api/notes/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', },
+            body: JSON.stringify(bodyObject)
+        })
+            .then(response => response.json())
+            .then(data => {
+                let message = data.error ? ("Error:" + data.error.message) : ("ノートを送信しました。")
+                logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
+
+                return data;
+            }).catch((error) => {
+                console.error('Error:', error);
+                logseq.UI.showMsg('Error:' + error.toString(), { timeout: 3000 });
+            });
+    }
+
+    async function repliesNote(accessToken, misskeyHostedDomain, note, replieNoteId, noteVisibility = "public", fileIds = []) {
+        // postNoteとほぼ同じ処理だが、APIのURLや投げるJSONが少し違うので別にしている
+        if (misskeyHostedDomain === "" || accessToken === "") {
+            logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
+            return;
+        }
+        let bodyObject = {
+            i: accessToken,
+            text: note,
+            visibility: noteVisibility,
+            replyId: replieNoteId
+        };
+        if (fileIds.length > 0) {
+            bodyObject.fileIds = fileIds;
+        }
+
+        // FIXME: https
+        return await fetch(`http://${misskeyHostedDomain}/api/notes/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', },
             body: JSON.stringify(bodyObject)
@@ -297,20 +333,24 @@ function main() {
 
     async function getBlockContentFromBlocks(blocks) {
         let contents = [];
-        // blockの投稿順序がどうでもいいこと前提
-        async function searchBlocks(blocks) {
-            for (const [_, blockUUID] of blocks) {
+
+        // ブロックの順番を保持しながら再帰的に探索
+        async function searchBlocks(a_blocks) {
+            for (const blockUUID of a_blocks) {
                 const block = await logseq.Editor.getBlock(blockUUID);
                 contents.push(block);
 
-                if (block.children.length > 0) {
-                    await searchBlocks(block.children);
+                if (block?.children && block.children.length > 0) {
+                    // childrenが存在する場合は、そのブロックIDの配列を渡す
+                    await searchBlocks(block.children.map(([_, uuid]) => uuid));
                 }
             }
         }
-        await searchBlocks(blocks);
+
+        await searchBlocks(blocks.map(([_, uuid]) => uuid)); // トップレベルのブロックIDの配列を渡す
         return contents;
     }
+
 
 
     function normalizeText(text, isRemoveTimestamp, isRemoveTask, isRemoveProperty) {
@@ -323,14 +363,14 @@ function main() {
         // プロパティ(hoge:: fuga形式、色付けやidの管理時に作成されている)を検索する
         const propertyRegex = /^.+:: .+/;
         // httpから始まらない画像のURLを検索する
-        const imageRegex = /!\[.*?\]\((?!http)(.*?)\)/g;
+        const imageRegex = /!\[.*?]\((?!http)(.*?)\)/g;
         // LOGBOOKを削除します。これはNOWなどで時間経過を記録するために使用されています。
         text = text.replaceAll(/:LOGBOOK:([\s\S]*?):END:/g, '')
 
         return text.split('\n').map(line => {
             line = line.replace(imageRegex, '');
             // {{コマンド テキスト}} を テキスト に変換します。これはYouTubeやTwitterの埋め込みを行うために使用されています。
-            line = line.replace(/\{\{.*?\s(.*?)\}\}/g, '$1')
+            line = line.replace(/\{\{.*?\s(.*?)}}/g, '$1')
 
             if (isRemoveProperty && propertyRegex.test(line)) {
                 return '';
@@ -460,7 +500,7 @@ function main() {
         });
 
     logseq.Editor.registerSlashCommand(
-        `misskeyに子ブロック(children)を投稿する`,
+        `misskeyに子ブロック(children)をツリーとして投稿する`,
         async () => {
             const {
                 isRemoveTimestamp,
@@ -485,7 +525,41 @@ function main() {
             ));
         });
 
+    logseq.Editor.registerSlashCommand(
+        `test`,
+        async () => {
 
+            const {
+                _isRemoveTimestamp, _isRemoveTask, _isRemoveProperty, _uploadExtensionAllowList, _currentMisskeyProfile,
+                misskeyAccessToken,
+                misskeyHostedDomain,
+                _misskeyNotePrevText, _misskeyNotePostText,
+                misskeyNoteVisibility
+            } = getSettings();
+            postNote(misskeyAccessToken, misskeyHostedDomain, "This is a test")
+
+            async function searchBlocks(a_blocks, replieNoteID=undefined) {
+                for (const blockUUID of a_blocks) {
+                    const block = await logseq.Editor.getBlock(blockUUID);
+                    let postedNoteID;
+                    if (replieNoteID !== undefined){
+                        postedNoteID = (await repliesNote(misskeyAccessToken, misskeyHostedDomain, block.content, replieNoteID, misskeyNoteVisibility))['createdNote'].id;
+                    } else {
+                        postedNoteID = (await postNote(misskeyAccessToken, misskeyHostedDomain, block.content, misskeyNoteVisibility))['createdNote'].id;
+                    }
+
+                    if (block?.children && block.children.length > 0) {
+                        // childrenが存在する場合は、そのブロックIDの配列を渡す
+                        await searchBlocks(block.children.map(([_, uuid]) => uuid), postedNoteID);
+                    }
+                }
+            }
+
+            const currentBlock = (await logseq.Editor.getCurrentBlock());
+            const replieNoteID = (await postNote(misskeyAccessToken, misskeyHostedDomain, currentBlock.content, misskeyNoteVisibility))['createdNote'].id;
+            await searchBlocks((await logseq.Editor.getCurrentBlock()).children.map(([_, uuid]) => uuid), replieNoteID); // トップレベルのブロックIDの配列を渡す
+        }
+    );
 
 
     logseq.Editor.registerSlashCommand(
@@ -521,7 +595,7 @@ function main() {
                     let bodyObject = {
                         noteId: noteId
                     };
-                    if (misskeyDomain == misskeyHostedDomain) {
+                    if (misskeyDomain === misskeyHostedDomain) {
                         bodyObject.i = misskeyAccessToken;
                     }
                     const response = await fetch(`https://${misskeyDomain}/api/notes/show`, {
@@ -559,7 +633,6 @@ function main() {
                     return [originalURL, replaceText];
                 } catch (error) {
                     console.error('Error:', error);
-                    return;
                 }
             });
 
