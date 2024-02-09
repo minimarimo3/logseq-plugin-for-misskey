@@ -9,5 +9,6 @@
     "id": "logseq-plugin-for-misskey",
     "title": "Misskey Plugin",
     "icon": "icon_ki.png"
-  }
+  },
+  "effect": true
 }
