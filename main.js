@@ -5,9 +5,9 @@ function main() {
         logseq.useSettingsSchema([
             {
                 key: "",
-                title: "LogseqMisskeyPluginの設定",
+                title: "Misskey Pluginの設定",
                 type: "heading",
-                description: "LogseqMisskeyPluginの設定を行います。",
+                description: "Misskey Pluginの設定を行います。",
                 default: "",
             },
             {
