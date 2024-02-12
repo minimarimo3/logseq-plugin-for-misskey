@@ -1,4 +1,4 @@
-# Logseq Misskey Plugin
+# Misskey Plugin(logseq-plugin-for-misskey)
 
 ## 拡張機能の説明
 
@@ -30,7 +30,7 @@ Misskey v2023.12.2で動作確認しました。自分はioにいるので同じ
 
 1. Misskey Webの`設定`->`API`から`アクセストークンの発行`をクリック
 ![APIの場所](./document/API_place.png)
-2. `名前`を適当に設定する(私はLogseq Misskey Pluginとしています)
+2. `名前`を適当に設定する(私は`logseq-plugin-for-misskey`としています)
 3. `権限`から`ドライブを操作する`と`ノートを作成・削除する`を選択する
     ※ "ドライブを操作する"権限は画像や動画などのアップロードに、"ノートを作成・削除する"権限はノートの作成に使用しています。
     ![APIの権限](./document/API_permission.png)
@@ -52,6 +52,7 @@ Misskey v2023.12.2で動作確認しました。自分はioにいるので同じ
 
 トゥートの埋め込み時に絵文字パースが入るせいで時間とかおかしくなるのの修正(show.user.instance.softwareName見ればいいと思うんだけど過去のバージョンどうなってるのか調べるの面倒)  
 登録アカウント数の制限解除設定。起動時設定スキーマの生成ですぐ終わるけど別に困ってないし
+MiAuthを使用した認証。これはAPIキー発行の手間がないのでぜひやりたい。
 
 ## その他
 
