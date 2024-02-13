@@ -535,7 +535,7 @@ function main() {
                     // data.user.nameはバージョンによってはnullの場合がある。少なくともv2023.11ではnull。空文字にしとく
                     replaceText += `${data.user.name || ""}[(@${data.user.username})さんの元ノートを開く](${originalURL})`;
 
-                    replaceText = (await parseMisskeyEmoji("\n" + replaceText.split("\n").map(line => `> ${line}`).join("\n") + "\n\n", misskeyDomain, data.emojis || {}));
+                    replaceText = (await parseMisskeyEmoji(`#+BEGIN_QUOTE\n${replaceText}\n#+END_QUOTE`, misskeyDomain, data.emojis || {}));
                     return [originalURL, replaceText];
                 } catch (error) {
                     console.error('Error:', error);
