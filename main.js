@@ -69,6 +69,8 @@ function main() {
         ]
         logseq.useSettingsSchema(settingSchema)
         let numberOfMisskeyProfile = logseq.settings["NumberOfMisskeyProfile"]
+        // 初回起動時、この値はundefinedになる
+        if (numberOfMisskeyProfile === undefined){ numberOfMisskeyProfile = 2 }
         if (!(0 < numberOfMisskeyProfile && numberOfMisskeyProfile < 10)) {
             logseq.UI.showMsg(`アカウントは(0<n<10)の範囲である必要があります(現在: ${numberOfMisskeyProfile})`, "error")
             numberOfMisskeyProfile = 2
@@ -450,6 +452,12 @@ function main() {
                 _misskeyNotePrevText, _misskeyNotePostText, _misskeyNoteVisibility
             } = getSettings();
 
+            if (misskeyAccessToken === ""){
+                await logseq.UI.showMsg("投稿・ダイレクトの確認をするために必要な権限を取得します。ブラウザが開いたページで`許可`を押し、再度コマンドを実行してください。", "success", {timeout: 8000})
+                updateAccessToken(misskeyHostedDomain)
+                return
+            }
+
             const block = await logseq.Editor.getCurrentBlock();
             let newBlockContent = block.content;
 
@@ -467,7 +475,7 @@ function main() {
                     let bodyObject = {
                         noteId: noteId
                     };
-                    if (misskeyDomain === misskeyHostedDomain) {
+                    if (misskeyDomain === misskeyHostedDomain && misskeyAccessToken !== "") {
                         bodyObject.i = misskeyAccessToken;
                     }
                     const response = await fetch(`https://${misskeyDomain}/api/notes/show`, {
@@ -521,12 +529,6 @@ function main() {
             logseq.Editor.updateBlock(block.uuid, newBlockContent);
         }
     );
-    logseq.Editor.registerSlashCommand(
-        `test`,
-        () => {
-            updateAccessToken("misskey.io")
-        }
-    )
 }
 
 
