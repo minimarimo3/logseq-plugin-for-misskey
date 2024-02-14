@@ -1,8 +1,6 @@
 function main() {
-    function settingUI() {
-        /* https://logseq.github.io/plugins/types/SettingSchemaDesc.html */
-        // TODO: 自動生成。アカウント増やしてって言われたら書き直す
-        logseq.useSettingsSchema([
+    function settingUi() {
+        let settingSchema = [
             {
                 key: "",
                 title: "Misskey Pluginの設定",
@@ -62,153 +60,103 @@ function main() {
                 default: "1つ目のアカウント"
             },
             {
-                key: "",
-                title: "MisskeyProfile1(必須)",
-                description: "Misskeyに登録しているアカウントの1つ目の設定です",
-                type: "heading",
-            },
-            {
-                key: "MisskeyAccountMemo1",
-                title: "アカウント1についてのメモ",
-                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-                type: "string",
-                default: ""
-            },
-            {
-                key: "MisskeyAccessToken1",
-                type: "string",
-                title: "Misskeyアクセストークン",
-                description: "1つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
-                default: ""
-            },
-            {
-                key: "MisskeyHostedDomain1",
-                type: "string",
-                title: "Misskeyがホストされているドメイン",
-                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePrevText1",
-                type: "string",
-                title: "Misskeyノートの前につける文字列",
-                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePostText1",
-                type: "string",
-                title: "Misskeyノートの後につける文字列",
-                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNoteVisibility1",
-                type: "enum",
-                title: "Misskeyノートの公開範囲",
-                description: "Misskeyノートの公開範囲を選択してください。",
-                enumPicker: "select",
-                enumChoices: ["public", "home", "followers"],
-                default: "public"
-            }, {
-                key: "",
-                title: "MisskeyProfile2(任意)",
-                description: "Misskeyに登録しているアカウントの2つ目の設定です",
-                type: "heading",
-            },
-            {
-                key: "MisskeyAccountMemo2",
-                title: "アカウント2についてのメモ",
-                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-                type: "string",
-                default: ""
-            },
-            {
-                key: "MisskeyAccessToken2",
-                type: "string",
-                title: "Misskeyアクセストークン",
-                description: "2つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
-                default: ""
-            },
-            {
-                key: "MisskeyHostedDomain2",
-                type: "string",
-                title: "Misskeyがホストされているドメイン",
-                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePrevText2",
-                type: "string",
-                title: "Misskeyノートの前につける文字列",
-                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePostText2",
-                type: "string",
-                title: "Misskeyノートの後につける文字列",
-                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNoteVisibility2",
-                type: "enum",
-                title: "Misskeyノートの公開範囲",
-                description: "Misskeyノートの公開範囲を選択してください。",
-                enumPicker: "select",
-                enumChoices: ["public", "home", "followers"],
-                default: "public"
-            }, {
-                key: "",
-                title: "MisskeyProfile3(任意)",
-                description: "Misskeyに登録しているアカウントの1つ目の設定です",
-                type: "heading",
-            },
-            {
-                key: "MisskeyAccountMemo3",
-                title: "アカウント3についてのメモ",
-                description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
-                type: "string",
-                default: ""
-            },
-            {
-                key: "MisskeyAccessToken3",
-                type: "string",
-                title: "Misskeyアクセストークン",
-                description: "3つ目のアカウントで発行したMisskeyアクセストークンを入力してください。Misskeyアクセストークンの取得方法は [README](https://github.com/minimarimo3/logseq-plugin-for-misskey) をご覧ください。",
-                default: ""
-            },
-            {
-                key: "MisskeyHostedDomain3",
-                type: "string",
-                title: "Misskeyがホストされているドメイン",
-                description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePrevText3",
-                type: "string",
-                title: "Misskeyノートの前につける文字列",
-                description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNotePostText3",
-                type: "string",
-                title: "Misskeyノートの後につける文字列",
-                description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
-                default: ""
-            },
-            {
-                key: "MisskeyNoteVisibility3",
-                type: "enum",
-                title: "Misskeyノートの公開範囲",
-                description: "Misskeyノートの公開範囲を選択してください。",
-                enumPicker: "select",
-                enumChoices: ["public", "home", "followers"],
-            },
-        ]);
+                key: "NumberOfMisskeyProfile",
+                title: "この拡張機能で使用するMisskeyアカウントの数",
+                description: "増やせば増やすだけ設定の項目が増えます(0<n<10)。変更を反映するにはLogseqの再起動が必要です",
+                type: "number",
+                default: 2
+            }
+        ]
+        logseq.useSettingsSchema(settingSchema)
+        let numberOfMisskeyProfile = logseq.settings["NumberOfMisskeyProfile"]
+        if (!(0 < numberOfMisskeyProfile && numberOfMisskeyProfile < 10)) {
+            logseq.UI.showMsg(`アカウントは(0<n<10)の範囲である必要があります(現在: ${numberOfMisskeyProfile})`, "error")
+            numberOfMisskeyProfile = 2
+        }
+        for (let i = 1; i <= numberOfMisskeyProfile; i++) {
+            const accountSettingScheme = [
+                {
+                    key: `MisskeyAccountMemo${i}`,
+                    title: `MisskeyProfile${i}(必須)`,
+                    description: `Misskeyに登録しているアカウントの${i}つ目の設定です`,
+                    type: "heading",
+                    default: ""
+                },
+                {
+                    key: `MisskeyAccountMemo${i}`,
+                    title: `アカウント${i}についてのメモ`,
+                    description: "プログラムから使用しません。メモを残せます。アカウント区別用のメモ欄として用意してあります。",
+                    type: "string",
+                    default: ""
+                },
+                {
+                    key: `MisskeyHostedDomain${i}`,
+                    type: "string",
+                    title: "Misskeyがホストされているドメイン",
+                    description: "Misskey がホストされているドメインを入力してください。[Acct](https://misskey-hub.net/en/docs/for-users/resources/glossary/#acct)の後ろに表示されている文字のことです。[@minimarimo3@misskey.io](https://misskey.io/@minimarimo3)ならmisskey.ioになります。",
+                    default: "misskey.io"
+                },
+                {
+                    key: `MisskeyNotePrevText${i}`,
+                    type: "string",
+                    title: "Misskeyノートの前につける文字列",
+                    description: "Misskeyノートの前につける文字列です。改行は\\nで表現してください",
+                    default: ""
+                },
+                {
+                    key: `MisskeyNotePostText${i}`,
+                    type: "string",
+                    title: "Misskeyノートの後につける文字列",
+                    description: "Misskeyノートの後につける文字列です。改行は\\nで表現してください",
+                    default: ""
+                },
+                {
+                    key: `MisskeyNoteVisibility${i}`,
+                    type: "enum",
+                    title: "Misskeyノートの公開範囲",
+                    description: "Misskeyノートの公開範囲を選択してください。",
+                    enumPicker: "select",
+                    enumChoices: ["public", "home", "followers"],
+                    default: "public"
+                },
+                {
+                    key: `MisskeyAccessToken${i}`,
+                    type: "string",
+                    title: "認証に使用するトークン(消さないでください)",
+                    description: "Misskeyへの投稿などで必要なので消さないでください。",
+                    default: ""
+                },
+            ]
+            settingSchema = settingSchema.concat(accountSettingScheme)
+        }
+        logseq.useSettingsSchema(settingSchema)
+    }
+
+
+    function updateAccessToken(misskeyHostedDomain) {
+        // MiAuthを使用しアクセストークンを取得し設定に登録します
+        const array = new Uint8Array(32);
+        window.crypto.getRandomValues(array);
+        const sessionId = Array.from(array, byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)).join('');
+
+        const appName = "logseq-plugin-for-misskey"
+        const iconURL = "https://raw.githubusercontent.com/logseq/marketplace/master/packages/logseq-plugin-for-misskey/icon_ki.png"
+        const authURL = `https://${misskeyHostedDomain}/miauth/${sessionId}?name=${appName}&icon=${iconURL}&permission=write:notes,write:drive`
+        const checkURL = `https://${misskeyHostedDomain}/api/miauth/${sessionId}/check`
+
+        window.open(`${authURL}`)
+        const intervalId = setInterval(() => {
+            fetch(checkURL, {method: "POST"})
+                .then((data) => data.json())
+                .then((data) => {
+                    if (data.ok) {
+                        clearInterval(intervalId)
+
+                        const currentMisskeyProfile = logseq.settings["CurrentMisskeyProfile"][0];
+                        logseq.updateSettings({[`MisskeyAccessToken${currentMisskeyProfile}`]: data["token"]})
+                    }
+                })
+        }, 5000)
     }
 
 
@@ -229,13 +177,13 @@ function main() {
                 const fileExtension = filePath.split('.').pop().toLowerCase();
 
                 if (!uploadExtensionAllowList.includes(fileExtension)) {
-                    logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", { timeout: 10000 })
+                    logseq.UI.showMsg(`投稿が許可されてない拡張子だったのでスキップしました。(このプラグインの設定から投稿可能な拡張子は変更できます): ${fileExtension}`, "error", {timeout: 10000})
                     return;
                 }
                 const response = await fetch(filePath);
                 const blob = await response.blob();
 
-                await logseq.UI.showMsg("アップロード中...", "success", { timeout: 3000 });
+                await logseq.UI.showMsg("アップロード中...", "success", {timeout: 3000});
 
                 let formData = new FormData();
                 formData.append('i', misskeyAccessToken);
@@ -248,14 +196,14 @@ function main() {
 
                 const data = await uploadResponse.json();
                 let message = data.error ? ("Error:" + data.error.message) : ("アップロード完了!");
-                logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
+                logseq.UI.showMsg(message, data.error ? "error" : "success", {timeout: 3000});
 
                 if (!data.error) {
                     imageIDList.push(data.id);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                logseq.UI.showMsg('Error:' + error.toString(), "error", { timeout: 3000 });
+                logseq.UI.showMsg('Error:' + error.toString(), "error", {timeout: 3000});
             }
         }));
 
@@ -263,9 +211,13 @@ function main() {
     }
 
 
-    async function postNote(accessToken, misskeyHostedDomain, note, {noteVisibility = "public", replyId=undefined, fileIds = []} = {}) {
+    async function postNote(accessToken, misskeyHostedDomain, note, {
+        noteVisibility = "public",
+        replyId = undefined,
+        fileIds = []
+    } = {}) {
         if (misskeyHostedDomain === "" || accessToken === "") {
-            logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", { timeout: 10000 });
+            logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginからMisskeyProfile1を埋めてください。", "error", {timeout: 10000});
             return;
         }
         let bodyObject = {
@@ -273,40 +225,54 @@ function main() {
             text: note,
             visibility: noteVisibility
         };
-        if (fileIds.length > 0) { bodyObject.fileIds = fileIds; }
-        if (replyId !== undefined){ bodyObject.replyId = replyId; }
+        if (fileIds.length > 0) {
+            bodyObject.fileIds = fileIds;
+        }
+        if (replyId !== undefined) {
+            bodyObject.replyId = replyId;
+        }
 
         return await fetch(`https://${misskeyHostedDomain}/api/notes/create`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
+            headers: {'Content-Type': 'application/json',},
             body: JSON.stringify(bodyObject)
         })
             .then(response => response.json())
             .then(data => {
                 let message = data.error ? ("Error:" + data.error.message) : ("ノートを送信しました。")
-                logseq.UI.showMsg(message, data.error ? "error" : "success", { timeout: 3000 });
+                logseq.UI.showMsg(message, data.error ? "error" : "success", {timeout: 3000});
 
                 return data;
             }).catch((error) => {
                 console.error('Error:', error);
-                logseq.UI.showMsg('Error:' + error.toString(), { timeout: 3000 });
+                logseq.UI.showMsg('Error:' + error.toString(), {timeout: 3000});
             });
     }
 
 
+    async function postNoteC(note, {replyId = undefined, fileIds = []} = {}) {
 
-    async function postNoteC(note, {replyId=undefined, fileIds = []} = {}) {
+        const isRemoveTimestamp = logseq.settings["IsRemoveTimestamp"];
+        const isRemoveTask = logseq.settings["IsRemoveTask"];
+        const isRemoveProperty = logseq.settings["IsRemoveProperty"];
+        const uploadExtensionAllowList = logseq.settings["uploadExtensionAllowList"].replace(/\s+/g, '').split(",");
+        const currentMisskeyProfile = logseq.settings["CurrentMisskeyProfile"][0];
+        const misskeyAccessToken = logseq.settings[`MisskeyAccessToken${currentMisskeyProfile}`];
+        const misskeyHostedDomain = logseq.settings[`MisskeyHostedDomain${currentMisskeyProfile}`];
+        const misskeyNotePrevText = logseq.settings[`MisskeyNotePrevText${currentMisskeyProfile}`];
+        const misskeyNotePostText = logseq.settings[`MisskeyNotePostText${currentMisskeyProfile}`];
+        const misskeyNoteVisibility = logseq.settings[`MisskeyNoteVisibility${currentMisskeyProfile}`];
 
-        const isRemoveTimestamp= logseq.settings["IsRemoveTimestamp"];
-        const isRemoveTask= logseq.settings["IsRemoveTask"];
-        const isRemoveProperty= logseq.settings["IsRemoveProperty"];
-        const uploadExtensionAllowList= logseq.settings["uploadExtensionAllowList"].replace(/\s+/g, '').split(",");
-        const currentMisskeyProfile= logseq.settings["CurrentMisskeyProfile"][0];
-        const misskeyAccessToken= logseq.settings[`MisskeyAccessToken${currentMisskeyProfile}`];
-        const misskeyHostedDomain= logseq.settings[`MisskeyHostedDomain${currentMisskeyProfile}`];
-        const misskeyNotePrevText= logseq.settings[`MisskeyNotePrevText${currentMisskeyProfile}`];
-        const misskeyNotePostText= logseq.settings[`MisskeyNotePostText${currentMisskeyProfile}`];
-        const misskeyNoteVisibility= logseq.settings[`MisskeyNoteVisibility${currentMisskeyProfile}`];
+        if (misskeyHostedDomain === ""){
+            logseq.UI.showMsg("Misskeyの設定がされていません。設定->プラグイン設定->logseq_misskey_pluginから`misskeyHostedDomain`を埋めてください。", "error", {timeout: 10000})
+            return
+        }
+
+        if (misskeyAccessToken === ""){
+            await logseq.UI.showMsg("投稿するために必要な権限を取得します。ブラウザが開いたページで`許可`を押し、再度コマンドを実行してください。", "success", {timeout: 8000})
+            updateAccessToken(misskeyHostedDomain)
+            return
+        }
 
         let postNoteContent = normalizeText(
             misskeyNotePrevText.replaceAll("\\n", "\n") + note + misskeyNotePostText.replace("\\n", "\n"),
@@ -357,7 +323,6 @@ function main() {
     }
 
 
-
     // FIXME: ↓画像のサイズを文字と同じ大きさにしたいので
     //   こうやってfontSizeを取得してるるけど、多分もっといい方法がある
     async function getCurrentImageSize(imageUrl) {
@@ -385,7 +350,6 @@ function main() {
 
         return [newWidth, newHeight]
     }
-
 
 
     async function parseMisskeyEmoji(text, emojiHostedDomain, emojis) {
@@ -427,7 +391,8 @@ function main() {
     }
 
 
-    settingUI();
+    settingUi();
+
     function getSettings() {
         return {
             isRemoveTimestamp: logseq.settings["IsRemoveTimestamp"],
@@ -452,12 +417,12 @@ function main() {
     logseq.Editor.registerSlashCommand(
         `misskeyに子ブロック(children)をツリーとして投稿する`,
         async () => {
-            async function searchBlocks(a_blocks, replyNoteId=undefined) {
+            async function searchBlocks(a_blocks, replyNoteId = undefined) {
                 for (const blockUUID of a_blocks) {
                     const block = await logseq.Editor.getBlock(blockUUID);
                     let postedNoteID;
-                    if (replyNoteId !== undefined){
-                        postedNoteID = (await postNoteC(block.content, { replyId: replyNoteId })).createdNote.id;
+                    if (replyNoteId !== undefined) {
+                        postedNoteID = (await postNoteC(block.content, {replyId: replyNoteId})).createdNote.id;
                     } else {
                         postedNoteID = (await postNoteC(block.content)).createdNote.id;
                     }
@@ -507,12 +472,12 @@ function main() {
                     }
                     const response = await fetch(`https://${misskeyDomain}/api/notes/show`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(bodyObject)
                     });
 
                     if (response.status !== 200) {
-                        logseq.UI.showMsg(`データの取得に失敗したノートがあります(${response.status})。ノート: ${originalURL}`, "error", { timeout: 10000 });
+                        logseq.UI.showMsg(`データの取得に失敗したノートがあります(${response.status})。ノート: ${originalURL}`, "error", {timeout: 10000});
                         return;
                     }
                     const data = await response.json();
@@ -556,8 +521,13 @@ function main() {
             logseq.Editor.updateBlock(block.uuid, newBlockContent);
         }
     );
+    logseq.Editor.registerSlashCommand(
+        `test`,
+        () => {
+            updateAccessToken("misskey.io")
+        }
+    )
 }
-
 
 
 logseq.ready(main).catch(console.error);
