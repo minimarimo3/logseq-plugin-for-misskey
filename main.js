@@ -411,13 +411,13 @@ function main() {
     }
 
     logseq.Editor.registerSlashCommand(
-        `misskeyに現在のブロック(current)を投稿する`,
+        `Misskeyに現在のブロック(current)を投稿する`,
         async () => {
             postNoteC((await logseq.Editor.getCurrentBlock()).content);
         });
 
     logseq.Editor.registerSlashCommand(
-        `misskeyに子ブロック(children)をツリーとして投稿する`,
+        `Misskeyに子ブロック(children)をツリーとして投稿する`,
         async () => {
             async function searchBlocks(a_blocks, replyNoteId = undefined) {
                 for (const blockUUID of a_blocks) {
@@ -443,7 +443,7 @@ function main() {
 
 
     logseq.Editor.registerSlashCommand(
-        `misskeyのノート(note)を埋め込む`,
+        `Misskeyのノート(note)を埋め込む`,
         async () => {
             const {
                 _isRemoveTimestamp, _isRemoveTask, _isRemoveProperty, _uploadExtensionAllowList, _currentMisskeyProfile,
